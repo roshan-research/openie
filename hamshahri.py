@@ -3,7 +3,7 @@ from hazm import sent_tokenize, word_tokenize, Normalizer, HamshahriReader, POST
 from InformationExtractor import InformationExtractor
 
 
-hamshahri = HamshahriReader('/home/alireza/Corpora/Hamshahri')
+hamshahri = HamshahriReader()
 normalizer = Normalizer()
 tagger = POSTagger()
 parser = DependencyParser(tagger=tagger)

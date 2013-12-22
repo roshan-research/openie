@@ -1,4 +1,4 @@
-deevpy
+Baaz
 ======
 
-Open information extraction from Persian web
+Open information extraction from Persian web.

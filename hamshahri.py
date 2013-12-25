@@ -16,10 +16,16 @@ for text in Bar(max=310000).iter(hamshahri.texts()):
 	texts.append(normalizer.normalize(text))
 	if len(texts) <= 1000: continue
 
-	sentences = sum([[word_tokenize(sentence) for sentence in sent_tokenize(text)] for text in texts], [])
+	sentences = []
+	for text in texts:
+		for sentence in sent_tokenize(text):
+			words = word_tokenize(sentence)
+			if len(words) >= 3:
+				sentences.append(words)
+	texts = []
+
 	tagged = tagger.batch_tag(sentences)
 	parsed = parser.tagged_batch_parse(tagged)
-	texts = []
 
 	for sentence in parsed:
 		# print('*', *[node['word'] for node in sentence.nodelist if node['word']], file=output)

@@ -28,7 +28,7 @@ for text in Bar(max=310000).iter(hamshahri.texts()):
 	parsed = parser.tagged_batch_parse(tagged)
 
 	for sentence in parsed:
-		# print('*', *[node['word'] for node in sentence.nodelist if node['word']], file=output)
+		print('#', *[node['word'] for node in sentence.nodelist if node['word']], file=output)
 		for information in extractor.extract(sentence):
 			print(*information, sep=' - ', file=output)
 		print(file=output)

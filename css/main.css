@@ -1,0 +1,41 @@
+
+/* bootstrap */
+
+body {
+	direction: rtl;
+	font-size: 18px;
+	line-height: 1.5;
+}
+body, h1, h2, h3 {
+	font-family: BMitra, Arial;
+}
+.form-control {
+	font-family: Arial;
+}
+.btn {
+	font-size: 17px;
+	padding: 5px 8px 3px;
+}
+h1, h2, h3 {
+	font-weight: bold;
+}
+[class*="col-"] {
+	float: right;
+}
+
+/* baaz */
+
+body {
+	background: url(../img/pattern.png)
+}
+
+#results {
+	margin-top: 20px;
+}
+#results p span {
+	padding: 1px 3px 0px;
+	margin-top: -1px;
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 4px;
+}

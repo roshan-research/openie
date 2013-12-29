@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>باز</title>
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://sobhe.ap01.aws.af.cm/css/BMitra.css">
+	<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div class="container">
+	<h2>باز</h2>
+	<p>استخراج آزاد اطلاعات در زبان فارسی</p>
+
+	<div class="row">
+		<div class="col-lg-3"><input class="form-control" type="text" name="argument0"></div>
+		<div class="col-lg-3"><input class="form-control" type="text" name="argument1"></div>
+		<div class="col-lg-3"><input class="form-control" type="text" name="relation"></div>
+		<div class="col-lg-3"><button id="search" class="btn btn-default">جستجو</button></div>
+	</div>
+	<div id="results"></div>
+</div>
+<div class="container footer">
+	<p>کاری از <a href="http://www.sobhe.ir">سُبحه</a></p>
+</div>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+	$('#search').click(function() {
+		var mark = function(sentence, phrase, kind) {
+			sentence = ' '+ sentence +' ';
+			index = sentence.indexOf(' '+ phrase +' ');
+			if (index >= 0)
+				return sentence.substr(0, index+1) +'<span class="'+ kind +'">'+ phrase +'</span>'+ sentence.substr(index+2 + phrase.length);
+			return sentence;
+		}
+		var highlight = function(sentence, argument0, argument1, relation) {
+			sentence = mark(sentence, argument0, 'alert-warning');
+			sentence = mark(sentence, argument1, 'alert-warning');
+			sentence = mark(sentence, relation, 'alert-info');
+			return sentence.replace('_', ' ');
+		}
+
+		$.ajax({
+			url: 'http://baaz-nournia.rhcloud.com/search',
+			type: 'POST',
+			dataType: 'json',
+			data: {'argument0': $('input[name=argument0]').val(), 'argument1': $('input[name=argument1]').val(), 'relation': $('input[name=relation]').val()},
+			error: function () {},
+			success : function (data) {
+				$('#results').empty();
+				$('#results').append('<p>تعداد <span class="alert-success">'+ data['hits'] +'</span> نتیجه:</p>');
+				$.each(data['results'], function(i, result) {
+					$('#results').append('<p >'+ highlight(result['sentence'], result['argument0'], result['argument1'], result['relation']) +'</p>');
+				});
+			}
+		});
+	});
+</script>
+</body>
+</html>

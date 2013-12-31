@@ -29,6 +29,10 @@ body {
 	background: url(../img/pattern.png)
 }
 
+.container {
+	max-width: 1000px;
+}
+
 #results {
 	margin-top: 20px;
 }
@@ -38,4 +42,10 @@ body {
 	border-style: solid;
 	border-width: 2px;
 	border-radius: 4px;
+}
+
+.footer p {
+	padding-right: 15px;
+	font-size: 90%;
+	color: #aaa;
 }

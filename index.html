@@ -30,14 +30,14 @@
 			sentence = ' '+ sentence +' ';
 			index = sentence.indexOf(' '+ phrase +' ');
 			if (index >= 0)
-				return sentence.substr(0, index+1) +'<span class="'+ kind +'">'+ phrase +'</span>'+ sentence.substr(index+2 + phrase.length);
-			return sentence;
+				return sentence.substr(0, index+1) +'<span class="'+ kind +'">'+ phrase +'</span> '+ sentence.substr(index+1 + phrase.length);
+			return sentence.trim();
 		}
 		var highlight = function(sentence, argument0, argument1, relation) {
 			sentence = mark(sentence, argument0, 'alert-warning');
 			sentence = mark(sentence, argument1, 'alert-warning');
 			sentence = mark(sentence, relation, 'alert-info');
-			return sentence.replace('_', ' ');
+			return sentence.replace(/_/g,' ');
 		}
 
 		$.ajax({

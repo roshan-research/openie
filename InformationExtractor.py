@@ -12,7 +12,7 @@ class InformationExtractor():
 		nodes = dependencygraph.nodelist
 		childs = lambda parent, rels=None: [nodes[n] for n in parent['deps'] if not rels or nodes[n]['rel'] == rels or nodes[n]['rel'] in rels]
 		subtree = lambda parent: sum([subtree(child) for child in childs(parent)], [parent])
-		words = lambda nodes: ' '.join([node['word'] for node in sorted(nodes, key=lambda n: n['address'])])
+		words = lambda nodes: ' '.join([node['word'] for node in sorted(nodes, key=lambda n: n['address']) if node['rel'] != 'PUNC'])
 
 		verbs = [node for node in nodes if node['tag'] == 'V']
 		for verb in verbs:

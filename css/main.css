@@ -7,17 +7,15 @@ body {
 	line-height: 1.5;
 }
 body, h1, h2, h3 {
-	font-family: BMitra, Arial;
+	font-family: BMitra, ENassim, Arial;
 }
-.form-control {
-	font-family: Arial;
-}
-.btn {
+.form-control, .btn {
 	font-size: 17px;
-	padding: 5px 8px 3px;
+	padding: 5px 10px 3px;
 }
 h1, h2, h3 {
 	font-weight: bold;
+	letter-spacing: -1px;
 }
 [class*="col-"] {
 	float: right;
@@ -31,21 +29,52 @@ body {
 
 .container {
 	max-width: 1000px;
+	position: relative;
+}
+
+.header p {
+	color: #555;
+}
+#goshawk {
+	position: absolute;
+	left: 0;
+	top: 0;
+	opacity: .7;
+	box-shadow: 0px 1px 5px #555;
+}
+
+.form-control, .btn {
+	border-color: #ddd;
+}
+
+#query #search {
+	margin-left: 10px;
+}
+#query .text-danger {
+	margin-top: 5px;
+	display: inline-block;
+}
+#query .loading {
+	margin-top: 1px;
+	background: url(../img/loading.gif);
+	height: 32px;
+	width: 32px;
 }
 
 #results {
 	margin-top: 20px;
 }
 #results p span {
-	padding: 1px 3px 0px;
-	margin-top: -1px;
+	padding: 0 3px;
 	border-style: solid;
 	border-width: 2px;
 	border-radius: 4px;
 }
 
 .footer p {
-	padding-right: 15px;
 	font-size: 90%;
 	color: #aaa;
+}
+.footer hr {
+	margin-bottom: 10px;
 }

@@ -4,28 +4,63 @@
 	<meta charset="utf-8">
 	<title>باز</title>
 	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-	<link rel="stylesheet" href="http://sobhe.ap01.aws.af.cm/css/BMitra.css">
+	<link rel="stylesheet" href="http://sobhe.ap01.aws.af.cm/css/Fonts.css">
 	<link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 <div class="container">
-	<h2>باز</h2>
-	<p>استخراج آزاد اطلاعات در زبان فارسی</p>
-
-	<div class="row">
-		<div class="col-lg-3"><input class="form-control" type="text" name="argument0"></div>
-		<div class="col-lg-3"><input class="form-control" type="text" name="argument1"></div>
-		<div class="col-lg-3"><input class="form-control" type="text" name="relation"></div>
-		<div class="col-lg-3"><button id="search" class="btn btn-default">جستجو</button></div>
+	<div class="header">
+		<img id="goshawk" src="img/goshawk.jpg">
+		<h1>باز</h1>
+		<p>استخراج آزاد اطلاعات در زبان فارسی</p>
 	</div>
+
+	<div>
+		<p style="margin-top: 30px">ما می‌خواهیم اطلاعات فارسی را از سراسر وب استخراج کنیم و این کار را با <a href="http://ece.ut.ac.ir/dbrg/hamshahri/faindex.html">بخشی از آرشیو روزنامه همشهری</a> آغاز کردیم. <br /> خطاهای استخراج کم نیستند، ولی پیدا کردن پاسخ این پرسش‌ها به ما نشان می‌دهد که اطلاعات با ارزشی داریم:</p>
+		<ul id="samples">
+			<li><a href="#" data-query="تیم - با - دیدار می‌کند">کدام تیم‌ها با هم دیدار می‌کنند؟</a></li>
+			<li><a href="#" data-query=" - در تهران - متولد شد">کدام شخصیت‌ها در تهران متولد شدند؟</a></li>
+			<li><a href="#" data-query="شاخص کل قیمت سهام - به واحد - ">شاخص کل قیمت سهام در چه وضعیتی است؟</a></li>
+			<li><a href="#" data-query="مصرف - در ایران - بالاست">نگران مصرف چه چیزهایی در کشور باشیم؟</a></li>
+			<li><a href="#" data-query="روزنامه -  - توقیف شد">کدام بیماری و در چه سالی شایع شد؟</a></li>
+		</ul>
+		<h3>جستجو در نتایج</h3>
+		<div id="query" class="row" style="margin-top: 15px">
+			<div class="col-lg-3"><input class="form-control" type="text" name="argument0" placeholder="آرگومان اول"></div>
+			<div class="col-lg-3"><input class="form-control" type="text" name="argument1" placeholder="آرگومان دوم"></div>
+			<div class="col-lg-3"><input class="form-control" type="text" name="relation" placeholder="رابطه دو آرگومان"></div>
+			<div class="col-lg-3">
+				<button id="search" class="btn btn-default pull-right">جستجو</button>
+				<span class="loading pull-right" style="display: none;"></span>
+				<span class="text-danger" style="display: none;">خطا در ارتباط!</span>
+			</div>
+		</div>
+	</div>
+
 	<div id="results"></div>
-	<hr>
+
+	<h3>اسناد</h3>
+	<ul>
+		<li>علیرضا نوریان، <a href="https://dl.dropboxusercontent.com/u/90405495/thesis.pdf">"تشابه‌یابی متون با توصیف رابطه‌ای"</a>، پایان‌نامه کارشناسی ارشد، دانشگاه علم و صنعت ایران، تهران، ۱۳۹۲. <a href="https://speakerdeck.com/nournia/text-similarity-using-relational-representation">+ ارائه</a></li>
+		<li>محسن ایمانی، <a href="http://bayanbox.ir/id/3312617597143201351?download">"ابهام زدایی و ارزیابی اطلاعات استخراج شده از متن زبان طبیعی"</a>، سمینار کارشناسی ارشد، دانشگاه علم و صنعت ایران، تهران، ۱۳۹۲. <a href="https://speakerdeck.com/imani/resolution-and-evaluation-of-extracted-informations-from-natural-language-text">+ ارائه</a></li>
+		<li>علیرضا نوریان، <a href="https://dl.dropboxusercontent.com/u/90405495/seminar.pdf">"استخراج آزاد اطلاعات"</a>، سمینار کارشناسی ارشد، دانشگاه علم و صنعت ایران، تهران، ۱۳۹۱. <a href="https://speakerdeck.com/nournia/open-information-extraction">+ ارائه</a></li>
+	</ul>
 </div>
 <div class="container footer">
-	<p>کاری از <a href="http://www.sobhe.ir">سُبحه</a></p>
+	<hr>
+	<p class="pull-right">کاری از <a href="http://www.sobhe.ir">سُبحه</a></p>
+	<p class="pull-left">به کجا رود کبوتر که اسیر <a href="http://www.sobhe.ir/baaz/">باز</a> باشد</p>
 </div>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script type="text/javascript">
+	$('#samples a').click(function() {
+		query = $(this).attr('data-query');
+		query = query.split(' - ');
+		$('#query input[name=argument0]').val(query[0]);
+		$('#query input[name=argument1]').val(query[1]);
+		$('#query input[name=relation]').val(query[2]);
+		$('#search').click();
+	});
 	$('#search').click(function() {
 		var mark = function(sentence, phrase, kind) {
 			sentence = ' '+ sentence +' ';
@@ -41,20 +76,31 @@
 			return sentence.replace(/_/g,' ');
 		}
 
+		$('#query .loading').show();
+		$('#query .text-danger').hide();
+		$('#search').attr('disabled','disabled');
 		$.ajax({
 			url: 'http://baaz-nournia.rhcloud.com/search',
 			type: 'POST',
 			dataType: 'json',
 			data: {'argument0': $('input[name=argument0]').val(), 'argument1': $('input[name=argument1]').val(), 'relation': $('input[name=relation]').val()},
-			error: function () {},
+			error: function () {
+				$('#query .text-danger').show();
+			},
 			success : function (data) {
 				$('#results').empty();
-				$('#results').append('<p>تعداد <span class="alert-success">'+ data['hits'] +'</span> نتیجه:</p>');
+				$('#results').append('<p>'+ data['hits'] +' نتیجه پیدا شد:</p>');
 				$.each(data['results'], function(i, result) {
 					$('#results').append('<p >'+ highlight(result['sentence'], result['argument0'], result['argument1'], result['relation']) +'</p>');
 				});
+			},
+			complete: function() {
+				$('#search').removeAttr('disabled');
+				$('#query .loading').hide();
 			}
 		});
+
+		return false;
 	});
 </script>
 </body>

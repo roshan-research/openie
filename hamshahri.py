@@ -1,6 +1,6 @@
 
 from hazm import sent_tokenize, word_tokenize, Normalizer, HamshahriReader, POSTagger, DependencyParser
-from InformationExtractor import InformationExtractor
+from DependencyTreeInformationExtractor import DependencyTreeInformationExtractor
 from progress.bar import Bar
 
 
@@ -8,7 +8,7 @@ hamshahri = HamshahriReader()
 normalizer = Normalizer()
 tagger = POSTagger()
 parser = DependencyParser(tagger=tagger)
-extractor = InformationExtractor()
+extractor = DependencyTreeInformationExtractor()
 texts = []
 
 output = open('informations.txt', 'w')

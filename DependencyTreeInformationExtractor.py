@@ -1,10 +1,11 @@
 
 from itertools import product
 
-class InformationExtractor():
+
+class DependencyTreeInformationExtractor():
 
 	def __init__(self):
-		self.adverbs = set(sum([line.split(' - ') for line in open('adverbs.dat').read().split('\n') if line.strip() and not line.startswith('#')], []))
+		self.adverbs = set(sum([line.split(' - ') for line in open('adverbs.dat', encoding='utf8').read().split('\n') if line.strip() and not line.startswith('#')], []))
 
 	def extract(self, dependencygraph):
 		""" extracts information from dependency tree """
@@ -14,7 +15,7 @@ class InformationExtractor():
 		subtree = lambda parent: sum([subtree(child) for child in childs(parent)], [parent])
 		words = lambda nodes: ' '.join([node['word'] for node in sorted(nodes, key=lambda n: n['address']) if node['rel'] != 'PUNC'])
 
-		verbs = [node for node in nodes if node['tag'] == 'V']
+		verbs = [node for node in nodes if node['ctag'] == 'V']
 		for verb in verbs:
 			relation = [verb]
 			arg1s = childs(verb, 'SBJ')

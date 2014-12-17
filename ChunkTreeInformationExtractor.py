@@ -54,8 +54,11 @@ class ChunkTreeInformationExtractor():
                 except Exception as e:
                     continue
             elif chunk.label() == 'VP':
+                rel = self.arg(chunk)
+                if type(chunks_list[c - 1]) is Tree and chunks_list[c - 1].label() is 'ADJP':
+                    rel = self.arg(chunks_list[c-1]) + ' ' + rel
                 for arg1, arg2 in product(arg1s, arg2s):
-                    informations.append((arg1, arg2, self.arg(chunk)))
+                    informations.append((arg1, arg2, rel))
                 arg1s = []
                 arg2s = []
 

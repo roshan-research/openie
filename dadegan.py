@@ -4,15 +4,14 @@ from DependencyTreeInformationExtractor import DependencyTreeInformationExtracto
 from ChunkTreeInformationExtractor import ChunkTreeInformationExtractor
 
 
-extractor = InformationExtractor()
 output = open('informations.txt', 'w', encoding='utf8')
 dadegan = DadeganReader('Resources/Dadegan/train.conll')
-chunkExtractor = ChunkTreeInformationExtractor()
-dependencyExtractor = InformationExtractor()
+chunk_extractor = ChunkTreeInformationExtractor()
+dependency_extractor = DependencyTreeInformationExtractor()
 for chunk_tree, dependency_graph in zip(dadegan.chunked_trees(), dadegan.trees()):
-	for information in chunkExtractor.extract(chunk_tree):
+	for information in chunk_extractor.extract(chunk_tree):
 		print(*information, sep=' - ', file=output)
 	print(file=output)
-	for information in dependencyExtractor.extract(dependency_graph):
+	for information in dependency_extractor.extract(dependency_graph):
 		print(*information, sep=' + ', file=output)
 	print(file=output)

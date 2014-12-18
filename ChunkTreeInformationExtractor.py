@@ -50,7 +50,8 @@ class ChunkTreeInformationExtractor():
                     elif type(chunks_list[c + 1]) == Tree and chunks_list[c + 1].label() == 'POSTP':
                         arg2s.append(self.arg(chunk) + ' ' + self.arg(chunks_list[c + 1]))
                     else:
-                        arg1s.append(self.arg(chunk))
+                        if len(arg1s) == 0:
+                            arg1s.append(self.arg(chunk))
                 except Exception as e:
                     continue
             elif chunk.label() == 'VP':

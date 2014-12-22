@@ -41,7 +41,7 @@ class ChunkTreeInformationExtractor():
                                 last_args[-1] += ' ' + chunk[0]
                             chunks_list.pop(c)
                 except Exception as e:
-                    print(e)
+                    pass
                 continue
             if chunk.label() == 'NP':
                 try:
@@ -55,11 +55,15 @@ class ChunkTreeInformationExtractor():
                 except Exception as e:
                     continue
             elif chunk.label() == 'VP':
-                rel = self.arg(chunk)
-                if type(chunks_list[c - 1]) is Tree and chunks_list[c - 1].label() is 'ADJP':
-                    rel = self.arg(chunks_list[c-1]) + ' ' + rel
-                for arg1, arg2 in product(arg1s, arg2s):
-                    informations.append((arg1, arg2, rel))
+                if len(arg1s) > 0 and len(arg2s) > 0:
+                    rel = self.arg(chunk)
+                    if len(chunk) <= 1 and type(chunks_list[c - 1]) is Tree:
+                        if chunks_list[c - 1].label() is 'ADJP':
+                            rel = self.arg(chunks_list[c - 1]) + ' ' + rel
+                        elif chunks_list[c - 1].label() == 'NP' and self.arg(chunks_list[c - 1]) not in (arg1s[-1] + arg2s[-1]):
+                            rel = self.arg(chunks_list[c - 1]) + ' ' + rel
+                    for arg1, arg2 in product(arg1s, arg2s):
+                        informations.append((arg1, arg2, rel))
                 arg1s = []
                 arg2s = []
 

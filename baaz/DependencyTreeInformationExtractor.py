@@ -1,11 +1,15 @@
 
+from __future__ import print_function
 from itertools import product
 
 
 class DependencyTreeInformationExtractor():
 
-	def __init__(self):
-		self.adverbs = set(sum([line.split(' - ') for line in open('adverbs.dat', encoding='utf8').read().split('\n') if line.strip() and not line.startswith('#')], []))
+	def __init__(self, adverbs_file=''):
+		self.adverbs = []
+
+		if adverbs_file:
+			self.adverbs = set(sum([line.split(' - ') for line in open(adverbs_file, encoding='utf8').read().split('\n') if line.strip() and not line.startswith('#')], []))
 
 	def extract(self, dependencygraph):
 		""" extracts information from dependency tree """

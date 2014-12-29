@@ -1,17 +1,11 @@
+
 from __future__ import print_function
 from itertools import product
 from nltk.tree import Tree
 
 
 class ChunkTreeInformationExtractor():
-	"""Class of Extracting informations of a sentence by some rules on chunks of the sentence
-		Example(dadegan.py):
-			dadegan = DadeganReader('Resources/Dadegan/train.conll')
-			chunk_extractor = ChunkTreeInformationExtractor()
-			chunk_tree = next(dadegan.chunked_trees())
-			for information in chunk_extractor.extract:
-				print(*information, sep=' - ')
-	"""
+
 	def __init__(self):
 		self.arg = lambda chunk: ' '.join([word for word, tag in chunk.leaves()])
 
@@ -53,7 +47,7 @@ class ChunkTreeInformationExtractor():
 							else:
 								last_args[-1] += ' ' + chunk[0]
 							chunks_list.pop(c)
-				except Exception as e:
+				except:
 					pass
 				continue
 			if chunk.label() == 'NP':
@@ -65,7 +59,7 @@ class ChunkTreeInformationExtractor():
 					else:
 						if len(arg1s) == 0:
 							arg1s.append(self.arg(chunk))
-				except Exception as e:
+				except:
 					continue
 			elif chunk.label() == 'VP':
 				if len(arg1s) > 0 and len(arg2s) > 0:
@@ -81,4 +75,3 @@ class ChunkTreeInformationExtractor():
 				arg2s = []
 
 		return informations
-

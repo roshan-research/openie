@@ -47,7 +47,7 @@ def extractCandidates(chunk_tree):
 	return candidates
 
 
-def tag_sent(chunks, information, label):
+def tag_sent(chunks, args):
 
 	global_index = 0
 	for chunk in chunks:
@@ -56,9 +56,8 @@ def tag_sent(chunks, information, label):
 		else:
 			tokens = [chunk]
 			chunk_label = 'O'
-		argLabel = '0'
 		for c in range(global_index, global_index + len(tokens)):
-			relLabel = 'O'
+			info_label = 'O'
 			local_index = c - global_index
 			word = tokens[local_index][0]
 			tag = tokens[local_index][1]
@@ -66,16 +65,25 @@ def tag_sent(chunks, information, label):
 				chunk_label = 'B-' + chunk.label()
 			elif type(chunk) is Tree:
 				chunk_label = 'I-' + chunk.label()
-			if c in information[0]:
-				argLabel = 1
-			elif c in information[1]:
-				argLabel = 2
-			elif label is True and c in information[2]:
-				if c == information[2][0]:
-					relLabel = 'B-Rel'
-				else:
-					relLabel = 'I-Rel'
-			print(word, tag, chunk_label, argLabel, relLabel, sep='\t', file=output)
+			for arg1 in args[0]:
+				if c in arg1:
+					if c == arg1[0]:
+						info_label = 'B-Arg1'
+					else:
+						info_label = 'I-Arg1'
+			for arg2 in args[1]:
+				if info_label == 'O' and c in arg2:
+					if c == arg2[0]:
+						info_label = 'B-Arg2'
+					else:
+						info_label = 'I-Arg2'
+			for rel in args[2]:
+				if info_label == 'O' and c in rel:
+					if c == rel[0]:
+						info_label = 'B-Rel'
+					else:
+						info_label = 'I-Rel'
+			print(word, tag, chunk_label, info_label, sep='\t', file=output)
 		global_index += len(tokens)
 	print(file=output)
 
@@ -97,35 +105,6 @@ def positions(info, sent):
 		info_list.append(arg_list)
 	return info_list
 
-
-"""
-for text in Bar(max=310000).iter(hamshahri.texts()):
-	texts.append(normalizer.normalize(text))
-	if len(texts) <= 10: continue
-
-	sentences = []
-	for text in texts:
-		for dep_tree in sent_tokenize(text):
-			words = word_tokenize(dep_tree)
-			if len(words) >= 3:
-				sentences.append(words)
-	texts = []
-
-	parsed = parser.parse_sents(sentences)
-	chunked = chunker.parse_sents(sentences)
-
-	for dep_tree, chunk_tree in zip(parsed, chunked):
-		print('#', *[node['word'] for node in dep_tree.nodelist if node['word']])
-		depInformations = dependencyExtractor.extract(dep_tree)
-		candidates = extractCandidates(chunk_tree)
-		candidateArgs = combinations(candidates, 2)
-		for information in depInformations:
-			print(*information, sep=' + ')
-		for candidateArg in candidateArgs:
-			print(*candidateArg, sep=' -- ')
-		print(file=output)
-"""
-
 input = codecs.open('200DadeganSents.txt', 'r', encoding='utf8')
 informations = []
 for line in input.readlines():
@@ -133,17 +112,13 @@ for line in input.readlines():
 		if len(line) > 1:
 			informations.append(line.replace('\n', '').split(' + '))
 		else:
-			for candidateArg in candidateArgs:
-				breaked = False
-				for information in informations:
-					if list(candidateArg) == information[:2]:
-						info_list = positions(information, sentence)
-						tag_sent(chunks, info_list, True)
-						breaked = True
-						break
-				if breaked is not True:
-					info_list = positions(candidateArg, sentence)
-					tag_sent(chunks, info_list, False)
+			info_list = ([], [], [])
+			for information in informations:
+				temp_list = positions(information, sentence)
+				for i in range(3):
+					if temp_list[i] not in info_list[i]:
+						info_list[i].append(temp_list[i])
+			tag_sent(chunks, info_list)
 			informations = []
 	else:
 		sentence = re.sub(r'^\d+-', '', line)

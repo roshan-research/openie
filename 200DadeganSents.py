@@ -7,14 +7,16 @@ import codecs, re
 from nltk.tree import Tree
 
 
-output = open('200DadeganSents-chunkExtractor.txt', 'w', encoding='utf8')
+#output = open('200DadeganSents-chunkExtractor.txt', 'w', encoding='utf8')
 dadegan = DadeganReader('resources/Dadegan/train.conll')
 tagger = SequencePOSTagger(model='Resources/postagger-remove-w3-all.model')
 chunker = Chunker(model='Resources/chunker-dadeganFull.model')
 normalizer = Normalizer()
 chunk_extractor = ChunkTreeInformationExtractor()
 dep_extractor = DependencyTreeInformationExtractor()
-trees = list(dadegan.chunked_trees())
+chunk_trees = list(dadegan.chunked_trees())
+dep_trees = list(dadegan.trees())
+dep_output = codecs.open('dep_output.txt', 'w', encoding='utf8')
 sentences = []
 for sent in dadegan.sents():
 	sentences.append(' '.join([w for w, t in sent]))
@@ -116,11 +118,11 @@ corrects = 0
 total = 0
 gold = gold_IOB_sents()
 for number, gold_sent in zip(indices, gold):
-	chunk_tree = trees[number]
+	chunk_tree = chunk_trees[number]
 	sentence = sentences[number]
 	#print("%d- %s" % (number, sentence), file=output)
-	informations = chunk_extractor.extract(chunk_tree)
-	for extractor_token, gold_token in zip(info2iob(sentence,chunk_tree, informations), gold_sent):
+	informations = list(dep_extractor.extract(dep_trees[number]))
+	for extractor_token, gold_token in zip(info2iob(sentence, chunk_tree, informations), gold_sent):
 		if extractor_token[-1] == gold_token[-1]:
 			corrects += 1
 		total += 1

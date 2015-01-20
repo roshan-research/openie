@@ -1,5 +1,5 @@
-
-from hazm import sent_tokenize, word_tokenize, Normalizer, HamshahriReader, SequencePOSTagger, DependencyParser, Chunker, Lemmatizer
+#coding=utf8
+from hazm import sent_tokenize, word_tokenize, Normalizer, HamshahriReader, SequencePOSTagger, DependencyParser, Chunker, Lemmatizer, DadeganReader
 from baaz import DependencyTreeInformationExtractor, ChunkTreeInformationExtractor
 from progress.bar import Bar
 from nltk import Tree
@@ -7,16 +7,16 @@ from itertools import combinations
 import codecs, re
 
 arg = lambda chunk: ' '.join([word for word, tag in chunk.leaves()])
-hamshahri = HamshahriReader('Resources/Hamshahri/')
-normalizer = Normalizer()
-tagger = SequencePOSTagger(model='Resources/postagger-remove-w3-all.model')
-parser = DependencyParser(tagger=tagger, lemmatizer=Lemmatizer())
-chunker = Chunker(tagger, model='Resources/chunker-dadeganFull.model')
+#hamshahri = HamshahriReader('Resources/Hamshahri/')
+#normalizer = Normalizer()
+#tagger = SequencePOSTagger(model='Resources/postagger-remove-w3-all.model')
+#parser = DependencyParser(tagger=tagger, lemmatizer=Lemmatizer())
+#chunker = Chunker(tagger, model='Resources/chunker-dadeganFull.model')
 dependencyExtractor = DependencyTreeInformationExtractor()
 chunkExtractor = ChunkTreeInformationExtractor()
 texts = []
 
-output = codecs.open('trainingSet.txt', 'w', encoding='utf8')
+output = codecs.open('trainingSet_dadegan.txt', 'w', encoding='utf8')
 
 def extractCandidates(chunk_tree):
 	candidates = []
@@ -106,7 +106,25 @@ def positions(info, sent):
 	return info_list
 
 input = codecs.open('200DadeganSents.txt', 'r', encoding='utf8')
+dadegan = DadeganReader('Resources/Dadegan/train.conll')
+dadegan_trees = dadegan.trees()
 informations = []
+sentences = []
+for sentence in dadegan.sents():
+	sentences.append(' '.join([w for w, t in sentence]))
+for tree, chunks, sent in zip(dadegan_trees, dadegan.chunked_trees(), sentences):
+	info_list = ([], [], [])
+	for information in dependencyExtractor.extract(tree):
+		temp_list = positions(information, sent)
+		for i in range(3):
+			if len(temp_list[i]) > 0 and temp_list[i] not in info_list[i]:
+						info_list[i].append(temp_list[i])
+	if [] in info_list:
+		continue
+	else:
+		tag_sent(chunks, info_list)
+
+"""
 for line in input.readlines():
 	if len(re.findall(r'^\d+-', line)) == 0:
 		if len(line) > 1:
@@ -128,6 +146,6 @@ for line in input.readlines():
 		chunks = chunker.parse(tokens)
 		candidates = extractCandidates(chunks)
 		candidateArgs = combinations(candidates, 2)
-
+"""
 
 

@@ -1,23 +1,15 @@
 from hazm import IOBTagger
 import codecs
+from nltk.tag import TaggerI
+
 
 
 tagger = IOBTagger(patterns=[
 		'*',
 
-		'u:w=%X[0,0]',
-		'u:wl1=%X[-1,0]',
-		'u:wr1=%X[1,0]',
-		#'u:wl2=%X[-2,0]',
-		#'u:wr2=%X[2,0]',
-
 		'*:tl1=%X[-1,1]',
-		#'*:tl2=%X[-2,1]',
-		#'*:tl3=%X[-3,1]',
 		'*:t=%X[0,1]',
 		'*:tr1=%X[1,1]',
-		#'*:tr2=%X[2,1]',
-		#'*:tr3=%X[3,1]',
 
 		'*:cp=%m[0,2,"..$"]',
 		'*:c=%X[0,2]',
@@ -27,16 +19,8 @@ tagger = IOBTagger(patterns=[
 
 		'*:cl1=%X[-1,2]',
 		'*:cl2=%X[-2,2]',
-		#'*:cl3=%X[-3,2]',
-		#'*:cl4=%X[-4,2]',
-		#'*:cl5=%X[-5,2]',
-		#'*:cl6=%X[-6,2]',
 		'*:cr1=%X[1,2]',
 		'*:cr2=%X[2,2]',
-		#'*:cr3=%X[3,2]',
-		#'*:cr4=%X[4,2]',
-		#'*:cr5=%X[5,2]',
-		#'*:cr6=%X[6,2]',
 	])
 
 training = codecs.open('trainingSet_dadegan.txt', 'r', encoding='utf8').read()
@@ -55,8 +39,8 @@ for i, raw_sentence in enumerate(training.split('\n\n')):
 
 
 THRESHOLD = int(len(sentences) * 0.9)
-tagger.train(sentences[:THRESHOLD])
-tagger.save_model('informations.model')
+tagger.train(sentences)
+tagger.save_model('informations-all-withWords.model')
 """
 test = []
 for sentence in sentences[THRESHOLD:]:

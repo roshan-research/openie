@@ -25,9 +25,6 @@ def getCurrent_line():
 global_index = 0
 _type, start, end, text = getCurrent_line()
 for i in range(100):
-	if i == 55:
-		global_index += 103
-		continue
 	chunk_tree = chunks[i]
 	for chunk in chunk_tree:
 		if type(chunk) is Tree:
@@ -36,8 +33,6 @@ for i in range(100):
 		else:
 			tokens = [chunk]
 			chunk_label = 'O'
-		if len(tokens) > 1 and tokens[-1] == tokens[-2]:
-			tokens.pop()
 		for c, node in enumerate(tokens):
 			word, tag = node[0], node[1]
 			if chunk_label != 'O':

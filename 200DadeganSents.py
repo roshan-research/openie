@@ -17,9 +17,9 @@ normalizer = Normalizer()
 chunk_extractor = ChunkTreeInformationExtractor()
 dep_extractor = DependencyTreeInformationExtractor()
 trees = list(dadegan.chunked_trees())
-chunk_trees = trees[:100] + trees[200:255] + trees[256:300]
+chunk_trees = trees[:100] + trees[200:300]
 trees = list(dadegan.trees())
-dep_trees = trees[:100] + trees[200:255] + trees[256:300]
+dep_trees = trees[:100] + trees[200:300]
 #dep_output = codecs.open('dep_output.txt', 'w', encoding='utf8')
 #sentences = []
 #for sent in dadegan.sents():
@@ -137,7 +137,6 @@ for gold_sent in gold:
 #dep_trees = parser.parse_sents(sentences)
 dep_tagged_sents = []
 chunk_tagged_sents = []
-print(len(gold), len(chunk_trees), len(dep_trees))
 for number, gold_sent in enumerate(gold):
 
 	sentence = ' '.join(sentences[number])
@@ -152,8 +151,9 @@ for number, gold_sent in enumerate(gold):
 		evaluation_sents.append(evaluation_sent)
 		dep_tagged_sents.append(dep_tagged_sent)
 		chunk_tagged_sents.append(chunk_tagged_sent)
-
-print(len(evaluation_sents), len(dep_tagged_sents))
+	else:
+		print(chunk_tagged_sent)
+		print()
 print('dependency accuracy: %f' % (accuracy(sum(evaluation_sents, []), sum(dep_tagged_sents, []))))
 print('chunk accuracy: %f' % (accuracy(sum(evaluation_sents, []), sum(chunk_tagged_sents, []))))
 

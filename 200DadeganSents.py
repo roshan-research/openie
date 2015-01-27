@@ -1,25 +1,27 @@
 
 from hazm import DadeganReader
 from baaz import ChunkTreeInformationExtractor, DependencyTreeInformationExtractor
-from hazm import Chunker, Normalizer, word_tokenize, SequencePOSTagger
-from random import randint
+from hazm import Chunker, Normalizer, SequencePOSTagger, IOBTagger, DependencyParser, Lemmatizer
 import codecs, re
+from nltk import accuracy
 from nltk.tree import Tree
 
 
 #output = open('200DadeganSents-chunkExtractor.txt', 'w', encoding='utf8')
-dadegan = DadeganReader('resources/Dadegan/train.conll')
+dadegan = DadeganReader('resources/Dadegan/test.conll')
 tagger = SequencePOSTagger(model='Resources/postagger-remove-w3-all.model')
+lemmatizer = Lemmatizer()
 chunker = Chunker(model='Resources/chunker-dadeganFull.model')
+parser = DependencyParser(tagger, lemmatizer=lemmatizer )
 normalizer = Normalizer()
 chunk_extractor = ChunkTreeInformationExtractor()
 dep_extractor = DependencyTreeInformationExtractor()
-chunk_trees = list(dadegan.chunked_trees())
-dep_trees = list(dadegan.trees())
-dep_output = codecs.open('dep_output.txt', 'w', encoding='utf8')
-sentences = []
-for sent in dadegan.sents():
-	sentences.append(' '.join([w for w, t in sent]))
+#chunk_trees = list(dadegan.chunked_trees())[:100]
+#dep_trees = list(dadegan.trees())[:100]
+#dep_output = codecs.open('dep_output.txt', 'w', encoding='utf8')
+#sentences = []
+#for sent in dadegan.sents():
+#	sentences.append(' '.join([w for w, t in sent]))
 indices = []
 
 def tag_sent(chunks, args):
@@ -81,6 +83,7 @@ def positions(info, sent):
 	return info_list
 
 def gold_IOB_sents(filename='200DadeganSents.txt'):
+	"""
 	gold = []
 	lines = codecs.open(filename, 'r', encoding='utf8').readlines()
 	informations = []
@@ -89,16 +92,22 @@ def gold_IOB_sents(filename='200DadeganSents.txt'):
 			if len(line) > 1:
 				informations.append(line.replace('\n', '').split(' + '))
 			else:
-				gold.append(info2iob(sentence, chunks, informations))
+				gold.append(info2iob(sentences[number], chunk_trees[number], informations))
 				informations = []
 		else:
-			indices.append(int(re.findall(r'^\d+-', line)[0][:-1]))
-			sentence = re.sub(r'^\d+-', '', line)
-			sentence = sentence.replace('\n', '')
-			print(sentence)
-			tokens = word_tokenize(normalizer.normalize(sentence))
-			tagged_tokens = tagger.tag(tokens)
-			chunks = chunker.parse(tagged_tokens)
+			number = int(re.findall(r'^\d+-', line)[0][:-1])
+			indices.append(number)
+	"""
+	lines = codecs.open(filename, 'r', encoding='utf8').readlines()
+	gold = []
+	sentence = []
+	for line in lines:
+		line = line.strip()
+		if line == '':
+			gold.append(sentence)
+			sentence = []
+		else:
+			sentence.append(tuple(line.split('\t')))
 	return gold
 
 def info2iob(sentence, chunks, informations):
@@ -116,19 +125,32 @@ def info2iob(sentence, chunks, informations):
 
 corrects = 0
 total = 0
-gold = gold_IOB_sents()
-for number, gold_sent in zip(indices, gold):
+gold = gold_IOB_sents('Resources/Dadegan-pages/001.tsv')
+gold = gold + gold_IOB_sents('Resources/Dadegan-pages/003.tsv')
+sentences = []
+evaluation_sents = []
+for gold_sent in gold:
+	sentences.append([w for w, t, c, l in gold_sent])
+	evaluation_sents.append([(w, l) for w, t, c, l in gold_sent])
+tokens = tagger.tag_sents(sentences)
+chunk_trees = list(chunker.parse_sents(tokens))
+dep_trees = parser.parse_sents(sentences)
+dep_tagged_sents = []
+chunk_tagged_sents = []
+for number, gold_sent in enumerate(gold):
+	sentence = ' '.join(sentences[number])
 	chunk_tree = chunk_trees[number]
-	sentence = sentences[number]
-	#print("%d- %s" % (number, sentence), file=output)
-	informations = list(dep_extractor.extract(dep_trees[number]))
-	for extractor_token, gold_token in zip(info2iob(sentence, chunk_tree, informations), gold_sent):
-		if extractor_token[-1] == gold_token[-1]:
-			corrects += 1
-		total += 1
+	dep_tree = dep_trees[number]
+	chunk_informations = list(chunk_extractor.extract(chunk_tree))
+	dep_informations = list(dep_extractor.extract(dep_tree))
+	dep_tagged_sents.append([(w,l) for w, t, c, l in [tokens for tokens in info2iob(sentence, chunk_tree, dep_informations)]])
+	chunk_tagged_sents.append([(w,l) for w, t, c, l in [tokens for tokens in info2iob(sentence, chunk_tree, chunk_informations)]])
+	if len(gold_sent) != len(dep_tagged_sents[-1]):
+		print('%s\n%s' % (gold_sent, dep_tagged_sents[-1]))
 
+print(len(sum(gold, [])), len(sum(dep_tagged_sents, [])))
+print('dependency accuracy: %f' % (accuracy(sum(evaluation_sents, []), sum(dep_tagged_sents, []))))
+print('chunk accuracy: %f' % (accuracy(sum(evaluation_sents, []), sum(chunk_tagged_sents, []))))
 
-#print('gold: ', len(gold))
-print('total: ', total)
-print('correct: ', corrects)
-print(corrects/total)
+information_tagger = IOBTagger(model='informations-all.model')
+print(information_tagger.evaluate(gold))

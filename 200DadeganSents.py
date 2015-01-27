@@ -16,8 +16,10 @@ parser = DependencyParser(tagger, lemmatizer=lemmatizer )
 normalizer = Normalizer()
 chunk_extractor = ChunkTreeInformationExtractor()
 dep_extractor = DependencyTreeInformationExtractor()
-#chunk_trees = list(dadegan.chunked_trees())[:100]
-#dep_trees = list(dadegan.trees())[:100]
+trees = list(dadegan.chunked_trees())
+chunk_trees = trees[:100] + trees[200:255] + trees[256:300]
+trees = list(dadegan.trees())
+dep_trees = trees[:100] + trees[200:255] + trees[256:300]
 #dep_output = codecs.open('dep_output.txt', 'w', encoding='utf8')
 #sentences = []
 #for sent in dadegan.sents():
@@ -125,30 +127,33 @@ def info2iob(sentence, chunks, informations):
 
 corrects = 0
 total = 0
-gold = gold_IOB_sents('Resources/Dadegan-pages/001.tsv')
-gold = gold + gold_IOB_sents('Resources/Dadegan-pages/003.tsv')
+gold = gold_IOB_sents('Resources/Dadegan-pages/001.tsv') + gold_IOB_sents('Resources/Dadegan-pages/003.tsv')
 sentences = []
 evaluation_sents = []
 for gold_sent in gold:
 	sentences.append([w for w, t, c, l in gold_sent])
-	evaluation_sents.append([(w, l) for w, t, c, l in gold_sent])
-tokens = tagger.tag_sents(sentences)
-chunk_trees = list(chunker.parse_sents(tokens))
-dep_trees = parser.parse_sents(sentences)
+#tokens = tagger.tag_sents(sentences)
+#chunk_trees = list(chunker.parse_sents(tokens))
+#dep_trees = parser.parse_sents(sentences)
 dep_tagged_sents = []
 chunk_tagged_sents = []
+print(len(gold), len(chunk_trees), len(dep_trees))
 for number, gold_sent in enumerate(gold):
+
 	sentence = ' '.join(sentences[number])
 	chunk_tree = chunk_trees[number]
 	dep_tree = dep_trees[number]
 	chunk_informations = list(chunk_extractor.extract(chunk_tree))
 	dep_informations = list(dep_extractor.extract(dep_tree))
-	dep_tagged_sents.append([(w,l) for w, t, c, l in [tokens for tokens in info2iob(sentence, chunk_tree, dep_informations)]])
-	chunk_tagged_sents.append([(w,l) for w, t, c, l in [tokens for tokens in info2iob(sentence, chunk_tree, chunk_informations)]])
-	if len(gold_sent) != len(dep_tagged_sents[-1]):
-		print('%s\n%s' % (gold_sent, dep_tagged_sents[-1]))
+	evaluation_sent = [(w, l) for w, t, c, l in gold_sent]
+	dep_tagged_sent = [(w,l) for w, t, c, l in [tokens for tokens in info2iob(sentence, chunk_tree, dep_informations)]]
+	chunk_tagged_sent = [(w,l) for w, t, c, l in [tokens for tokens in info2iob(sentence, chunk_tree, chunk_informations)]]
+	if len(evaluation_sent) == len(dep_tagged_sent):
+		evaluation_sents.append(evaluation_sent)
+		dep_tagged_sents.append(dep_tagged_sent)
+		chunk_tagged_sents.append(chunk_tagged_sent)
 
-print(len(sum(gold, [])), len(sum(dep_tagged_sents, [])))
+print(len(evaluation_sents), len(dep_tagged_sents))
 print('dependency accuracy: %f' % (accuracy(sum(evaluation_sents, []), sum(dep_tagged_sents, []))))
 print('chunk accuracy: %f' % (accuracy(sum(evaluation_sents, []), sum(chunk_tagged_sents, []))))
 

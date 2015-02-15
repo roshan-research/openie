@@ -2,9 +2,8 @@ from hazm import IOBTagger
 import codecs
 from nltk.tag import TaggerI
 
-
-
-tagger = IOBTagger(patterns=[
+class LearningBasedInformationExtractor(TaggerI):
+	def __init__(self, patterns=[
 		'*',
 
 		'*:tl1=%X[-1,1]',
@@ -21,46 +20,15 @@ tagger = IOBTagger(patterns=[
 		'*:cl2=%X[-2,2]',
 		'*:cr1=%X[1,2]',
 		'*:cr2=%X[2,2]',
-	])
+	], model = None):
+		self.tagger = IOBTagger(patterns)
+		if model is not None:
+			self.model = model
 
-training = codecs.open('trainingSet_dadegan.txt', 'r', encoding='utf8').read()
+	def train(self, sentences, model_file='Resources/informations.model'):
+		self.tagger.train(sentences)
+		self.tagger.save_model(model_file)
+		self.model = self.tagger.model
 
-sentences = []
-
-for i, raw_sentence in enumerate(training.split('\n\n')):
-	sentence = []
-	if len(raw_sentence) < 1:
-		continue
-	for word in raw_sentence.split('\n'):
-		features = word.split('\t')
-		sentence.append(tuple(features))
-	sentences.append(sentence)
-
-
-
-THRESHOLD = int(len(sentences) * 0.9)
-tagger.train(sentences)
-tagger.save_model('informations-all-withWords.model')
-"""
-test = []
-for sentence in sentences[THRESHOLD:]:
-	test_sent = []
-	for token in sentence:
-		test_sent.append(token[:-1])
-	test.append(test_sent)
-
-tagged_sents = tagger.tag_sents(test)
-corrects = 0
-total = 0
-for tagged, gold in zip(tagged_sents, sentences[THRESHOLD:]):
-	for tagged_token, gold_token in zip(tagged, gold):
-		if tagged_token[-1] == gold_token[-1]:
-			corrects += 1
-		total += 1
-
-print(corrects / total)
-"""
-print(tagger.evaluate(sentences[THRESHOLD:]))
-print(sentences[0])
-print()
-#print(tagger.tag(test[0]))
+	def tag(self, sent):
+		return self.tagger.tag(sent)

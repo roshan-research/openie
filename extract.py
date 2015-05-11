@@ -1,13 +1,14 @@
 
 from __future__ import print_function
-from hazm import *
+import codecs
 from itertools import chain
+from hazm import *
 from baaz import DependencyTreeInformationExtractor
 
 
 hamshahri = HamshahriReader(root='corpora/hamshahri')
-persica = PersicaReader(root='corpora/persica.csv')
-uninformatives = set(sum([line.split(' - ') for line in open('data/adverbs.dat', encoding='utf8').read().split('\n') if line.strip() and not line.startswith('#')], []))
+persica = PersicaReader(csv_file='corpora/persica.csv')
+uninformatives = set(sum([line.split(' - ') for line in codecs.open('data/adverbs.dat', encoding='utf8').read().split('\n') if line.strip() and not line.startswith('#')], []))
 
 
 normalizer = Normalizer()
@@ -16,14 +17,19 @@ parser = TurboParser(tagger=tagger, lemmatizer=Lemmatizer(), model_file='resourc
 extractor = DependencyTreeInformationExtractor()
 
 
-output = open('resources/informations.txt', 'w', encoding='utf8')
+output = codecs.open('resources/informations.txt', 'w', encoding='utf8')
 for text in chain(hamshahri.texts(), persica.texts()):
-	sentences = [word_tokenize(sentence) for sentence in sent_tokenize(normalizer.normalize(text)) if len(sentence) > 10]
+	sentences = [word_tokenize(sentence) for sentence in sent_tokenize(normalizer.normalize(text)) if len(sentence) > 15]
 
-	for sentence in parser.parse_sents(sentences):
-		print('#', *[node['word'] for node in tree.nodes.values() if node['word']], file=output)
+	try:
 
-		for information in extractor.extract(sentence):
-			if information[1] not in uninformatives:
-				print(*information, sep=' - ', file=output)
-		print(file=output)
+		for tree in parser.parse_sents(sentences):
+			print('#', *[node['word'] for node in tree.nodes.values() if node['word']], file=output)
+
+			for information in extractor.extract(tree):
+				if information[1] not in uninformatives:
+					print(*information, sep=' - ', file=output)
+			print(file=output)
+
+	except:
+		print('Error while prcoessing:', *sentences, sep='\n')

@@ -5,9 +5,9 @@ from itertools import product
 class DependencyTreeInformationExtractor():
 	""" extracts information from dependency tree """
 
-	def extract(self, dependencygraph):
-		nodes = dependencygraph.nodelist
-		childs = lambda parent, rels=None: [nodes[n] for n in parent['deps'] if not rels or nodes[n]['rel'] == rels or nodes[n]['rel'] in rels]
+	def extract(self, tree):
+		nodes = list(tree.nodes.values())
+		childs = lambda parent, rels=None: [nodes[n] for n in sum([parent['deps'][rel] for rel in parent['deps'] if not rels or rel == rels or rel in rels], [])]
 		subtree = lambda parent: sum([subtree(child) for child in childs(parent)], [parent])
 		words = lambda nodes: ' '.join([node['word'] for node in sorted(nodes, key=lambda n: n['address']) if node['rel'] != 'PUNC'])
 

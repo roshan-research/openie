@@ -4,7 +4,7 @@ from baaz import DependencyTreeInformationExtractor, ChunkTreeInformationExtract
 
 
 output = open('resources/informations.txt', 'w', encoding='utf8')
-dadegan = DadeganReader('resources/train.conll')
+dadegan = DadeganReader('corpora/train.conll')
 chunk_extractor = ChunkTreeInformationExtractor()
 dependency_extractor = DependencyTreeInformationExtractor(adverbs_file='data/adverbs.dat')
 

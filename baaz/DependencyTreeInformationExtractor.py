@@ -3,16 +3,9 @@ from itertools import product
 
 
 class DependencyTreeInformationExtractor():
-
-	def __init__(self, adverbs_file=''):
-		self.adverbs = []
-
-		if adverbs_file:
-			self.adverbs = set(sum([line.split(' - ') for line in open(adverbs_file, encoding='utf8').read().split('\n') if line.strip() and not line.startswith('#')], []))
+	""" extracts information from dependency tree """
 
 	def extract(self, dependencygraph):
-		""" extracts information from dependency tree """
-
 		nodes = dependencygraph.nodelist
 		childs = lambda parent, rels=None: [nodes[n] for n in parent['deps'] if not rels or nodes[n]['rel'] == rels or nodes[n]['rel'] in rels]
 		subtree = lambda parent: sum([subtree(child) for child in childs(parent)], [parent])
@@ -45,6 +38,4 @@ class DependencyTreeInformationExtractor():
 
 			# yield results
 			for arg1, arg2 in product(arg1s, arg2s):
-				information = list(map(words, (subtree(arg1), subtree(arg2), relation)))
-				if information[1] not in self.adverbs:
-					yield information
+				yield list(map(words, (subtree(arg1), subtree(arg2), relation)))

@@ -1,20 +1,21 @@
 
-from hazm import sent_tokenize, word_tokenize, Normalizer, HamshahriReader, POSTagger, DependencyParser
-from DependencyTreeInformationExtractor import DependencyTreeInformationExtractor
-from progress.bar import Bar
+from __future__ import print_function
+from hazm import *
+from baaz import DependencyTreeInformationExtractor
 
 
 hamshahri = HamshahriReader()
 normalizer = Normalizer()
-tagger = POSTagger()
-parser = DependencyParser(tagger=tagger)
+tagger = POSTagger(model='resources/postagger.model')
+parser = TurboParser(tagger=tagger, lemmatizer=Lemmatizer(), model_file='resources/turboparser.model')
 extractor = DependencyTreeInformationExtractor()
 texts = []
 
 output = open('informations.txt', 'w')
-for text in Bar(max=310000).iter(hamshahri.texts()):
+for text in hamshahri.texts():
 	texts.append(normalizer.normalize(text))
-	if len(texts) <= 1000: continue
+	if len(texts) <= 1000:
+		continue
 
 	sentences = []
 	for text in texts:
@@ -24,11 +25,8 @@ for text in Bar(max=310000).iter(hamshahri.texts()):
 				sentences.append(words)
 	texts = []
 
-	tagged = tagger.batch_tag(sentences)
-	parsed = parser.tagged_batch_parse(tagged)
-
-	for sentence in parsed:
-		print('#', *[node['word'] for node in sentence.nodelist if node['word']], file=output)
+	for sentence in parser.parse_sents(sentences):
+		print('#', *[node['word'] for node in tree.nodes.values() if node['word']], file=output)
 		for information in extractor.extract(sentence):
 			print(*information, sep=' - ', file=output)
 		print(file=output)

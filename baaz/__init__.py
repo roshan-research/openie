@@ -1,3 +1,4 @@
 
-from .ChunkTreeInformationExtractor import ChunkTreeInformationExtractor
 from .DependencyTreeInformationExtractor import DependencyTreeInformationExtractor
+from .ChunkTreeInformationExtractor import ChunkTreeInformationExtractor
+from .LearningBasedInformationExtractor import LearningBasedInformationExtractor

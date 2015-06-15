@@ -19,9 +19,8 @@ extractor = DependencyTreeInformationExtractor()
 
 output = codecs.open('resources/informations.txt', 'w', encoding='utf8')
 for text in chain(hamshahri.texts(), persica.texts()):
-	sentences = [word_tokenize(sentence) for sentence in sent_tokenize(normalizer.normalize(text)) if len(sentence) > 15]
-
 	try:
+		sentences = [word_tokenize(sentence) for sentence in sent_tokenize(normalizer.normalize(text)) if len(sentence) > 15]
 
 		for tree in parser.parse_sents(sentences):
 			print('#', *[node['word'] for node in tree.nodes.values() if node['word']], file=output)

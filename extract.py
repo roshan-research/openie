@@ -17,18 +17,23 @@ parser = TurboParser(tagger=tagger, lemmatizer=Lemmatizer(), model_file='resourc
 extractor = DependencyTreeInformationExtractor()
 
 
-output = codecs.open('resources/informations.txt', 'w', encoding='utf8')
+informations = codecs.open('resources/informations.txt', 'a+', encoding='utf8')
+processed_sentences = set([line[2:] for line in informations if line.startswith('#')])
+
+
 for text in chain(hamshahri.texts(), persica.texts()):
 	try:
-		sentences = [word_tokenize(sentence) for sentence in sent_tokenize(normalizer.normalize(text)) if len(sentence) > 15]
+		sentences = [word_tokenize(sentence) for sentence in sent_tokenize(normalizer.normalize(text)) if len(sentence) > 15 and ' '.join(sentence) not in processed_sentences]
+		if not sentences:
+			continue
 
 		for tree in parser.parse_sents(sentences):
-			print('#', *[node['word'] for node in tree.nodes.values() if node['word']], file=output)
+			print('#', *[node['word'] for node in tree.nodes.values() if node['word']], file=informations)
 
 			for information in extractor.extract(tree):
 				if information[1] not in uninformatives:
-					print(*information, sep=' - ', file=output)
-			print(file=output)
+					print(*information, sep=' - ', file=informations)
+			print(file=informations)
 
-	except:
-		print('Error while prcoessing:', *sentences, sep='\n')
+	except Exception as error:
+		print(error, 'while prcoessing:', *sentences, sep='\n')

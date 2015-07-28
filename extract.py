@@ -21,6 +21,8 @@ informations = codecs.open('resources/informations.txt', 'a+', encoding='utf8')
 processed_sentences = set([line.strip()[2:] for line in informations if line.startswith('#')])
 
 
+errors = codecs.open('resources/errors.txt', 'w', encoding='utf8')
+
 for text in chain(hamshahri.texts(), persica.texts()):
 	try:
 		sentences = [sentence for sentence in sent_tokenize(normalizer.normalize(text)) if len(sentence) > 15 and sentence not in processed_sentences]
@@ -36,4 +38,4 @@ for text in chain(hamshahri.texts(), persica.texts()):
 			print(file=informations)
 
 	except Exception as error:
-		print(error, 'while prcoessing:', *sentences, sep='\n')
+		print(error, 'while prcoessing:', *sentences, sep='\n', file=errors)

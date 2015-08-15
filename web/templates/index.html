@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>باز</title>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://sobhe.ap01.aws.af.cm/css/Fonts.css">
+	<link rel="stylesheet" href="http://www.sobhe.ir/baaz/css/main.css">
+</head>
+<body>
+<style type="text/css">
+#results p a {
+	padding: 0 3px;
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 4px;
+	text-decoration: none;
+}
+#results p a:not([href]) {
+	cursor: default;
+}
+.arg1, .arg2 {
+	color: #8a6d3b;
+	background-color: #fcf8e3;
+	border-color: #faebcc;
+}
+.arg1:hover, .arg2:hover {
+	color: #8a6d3b;
+}
+.rel {
+	color: #31708f;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
+}
+.rel:hover {
+	color: #31708f;
+}
+</style>
+<div class="container">
+	<div class="header">
+		<img id="goshawk" src="http://www.sobhe.ir/baaz/img/goshawk.jpg">
+		<h1>باز</h1>
+		<p>استخراج آزاد اطلاعات در زبان فارسی</p>
+	</div>
+
+	<div>
+		<p style="margin-top: 30px">ما می‌خواهیم اطلاعات فارسی را از سراسر وب استخراج کنیم و این کار را با <a href="http://ece.ut.ac.ir/dbrg/hamshahri/faindex.html">بخشی از آرشیو روزنامه همشهری</a> آغاز کردیم. <br /> خطاهای استخراج کم نیستند، ولی پیدا کردن پاسخ این پرسش‌ها به ما نشان می‌دهد که اطلاعات با ارزشی داریم:</p>
+		<ul id="samples">
+			<li><a href="#" data-query="تیم - با - دیدار می‌کند">کدام تیم‌ها با هم دیدار می‌کنند؟</a></li>
+			<li><a href="#" data-query=" - در تهران - متولد شد">کدام شخصیت‌ها در تهران متولد شدند؟</a></li>
+			<li><a href="#" data-query="شاخص کل قیمت سهام - به واحد - ">شاخص کل قیمت سهام در چه وضعیتی است؟</a></li>
+			<li><a href="#" data-query="مصرف - در ایران - بالاست">نگران مصرف چه چیزهایی در کشور باشیم؟</a></li>
+			<li><a href="#" data-query=" - در سال - شایع شد">کدام بیماری و در چه سالی شایع شد؟</a></li>
+		</ul>
+		<h3>جستجو در نتایج</h3>
+		<div id="query" class="row" style="margin-top: 15px">
+			<div class="col-lg-3"><input class="form-control" type="text" name="argument1" placeholder="آرگومان اول"></div>
+			<div class="col-lg-3"><input class="form-control" type="text" name="argument2" placeholder="آرگومان دوم"></div>
+			<div class="col-lg-3"><input class="form-control" type="text" name="relation" placeholder="رابطه دو آرگومان"></div>
+			<div class="col-lg-3">
+				<button id="search" class="btn btn-default pull-right">جستجو</button>
+				<span class="loading pull-right" style="display: none;"></span>
+				<span class="text-danger" style="display: none;">خطا در ارتباط!</span>
+			</div>
+		</div>
+	</div>
+
+	<div id="results"></div>
+
+</div>
+<div class="container footer">
+	<hr>
+	<p class="pull-right">کاری از <a href="http://www.sobhe.ir">سُبحه</a></p>
+	<p class="pull-left">به کجا رود کبوتر که اسیر <a href="http://www.sobhe.ir/baaz/">باز</a> باشد</p>
+</div>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript">
+	$('#samples a').click(function() {
+		query = $(this).attr('data-query');
+		query = query.split(' - ');
+		$('#query input[name=argument1]').val(query[0]);
+		$('#query input[name=argument2]').val(query[1]);
+		$('#query input[name=relation]').val(query[2]);
+		$('#search').click();
+	});
+	$('#search').click(function() {
+		$('#query .loading').show();
+		$('#query .text-danger').hide();
+		$('#search').attr('disabled','disabled');
+		$.ajax({
+			url: '/search',
+			type: 'POST',
+			dataType: 'json',
+			data: {'argument1': $('input[name=argument1]').val(), 'argument2': $('input[name=argument2]').val(), 'relation': $('input[name=relation]').val()},
+			error: function () {
+				$('#query .text-danger').show();
+			},
+			success : function (data) {
+				$('#results').empty();
+				$('#results').append('<p>'+ data['hits'] +' نتیجه پیدا شد:</p>');
+				$.each(data['htmls'], function(i, result) {
+					$('#results').append('<p>'+ result +'</p>');
+				});
+			},
+			complete: function() {
+				$('#search').removeAttr('disabled');
+				$('#query .loading').hide();
+			}
+		});
+
+		return false;
+	});
+</script>
+</body>
+</html>

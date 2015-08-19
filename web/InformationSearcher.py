@@ -1,6 +1,7 @@
 # coding: utf8
 
 from __future__ import unicode_literals
+import re
 from lucene import *
 
 
@@ -49,11 +50,9 @@ class InformationSearcher():
 class Information():
 	def __init__(self, doc):
 		fields = doc.getFields()
-		i = 0
-		while i < fields.size():
+		for i in range(fields.size()):
 			field = fields.get(i)
 			self.addField(field.name().lower(), field.stringValue())
-			i += 1
 
 		def parse_data(arg1_data):
 			if len(arg1_data) > 0:
@@ -65,17 +64,22 @@ class Information():
 		self.arg2_wiki, self.arg2_labels = parse_data(self.arg2_data)
 
 	def html(self):
+		refine = lambda s: s.replace('_', ' ')
+
 		highlights = {
-			self.rel: '<a class="rel">{}</a>'.format(self.rel),
-			self.arg1: '<a class="arg1" {} rel="{}">{}</a>'.format('href="%s"' % self.arg1_wiki if self.arg1_wiki else '', self.arg1_labels, self.arg1),
-			self.arg2: '<a class="arg2" {} rel="{}">{}</a>'.format('href="%s"' % self.arg2_wiki if self.arg2_wiki else '', self.arg2_labels, self.arg2),
+			refine(self.rel): '<a class="rel">{}</a>'.format(refine(self.rel)),
+			refine(self.arg1): '<a class="arg1" {} rel="{}">{}</a>'.format('href="%s"' % self.arg1_wiki if self.arg1_wiki else '', self.arg1_labels, refine(self.arg1)),
+			refine(self.arg2): '<a class="arg2" {} rel="{}">{}</a>'.format('href="%s"' % self.arg2_wiki if self.arg2_wiki else '', self.arg2_labels, refine(self.arg2)),
 		}
 
-		result = ' ' + self.info + ' '
+		result = ' %s ' % refine(self.info)
 		for key, value in highlights.items():
-			result = result.replace(' ' + key + ' ', ' ' + value + ' ')
+			if result.count(key) == 1:
+				result = result.replace(key, value)
+			else:
+				result = re.sub(' %s([.:,?!،؟]?) ' % key, r' %s\1 ' % value, result)
 
-		return result
+		return result.strip()
 
 	def addField(self, name, value):
 		if hasattr(self, name):

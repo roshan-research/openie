@@ -22,11 +22,15 @@ class InformationSearcher():
 		arg2_query.setMinimumNumberShouldMatch(1)
 		rel_query.setMinimumNumberShouldMatch(1)
 
-		arg1_query.add(TermQuery(Term('arg1', arg1)), BooleanClause.Occur.SHOULD)
-		arg1_query.add(WildcardQuery(Term('arg1_categories', '*' + arg1.lower().replace(' ', '_') + '*')), BooleanClause.Occur.SHOULD)
+		arg1_query.add(WildcardQuery(Term('arg1', '*' + arg1 + '*')), BooleanClause.Occur.SHOULD)
+		arg1_query.add(WildcardQuery(Term('arg1_data', arg1.lower().replace(' ', '_'))), BooleanClause.Occur.SHOULD)
+		arg1_query.add(WildcardQuery(Term('arg1_data', 'en:' + arg1.lower().replace(' ', '_'))), BooleanClause.Occur.SHOULD)
+		arg1_query.add(WildcardQuery(Term('arg1_data', 'fa:' + arg1.lower().replace(' ', '_'))), BooleanClause.Occur.SHOULD)
 
-		arg2_query.add(TermQuery(Term('arg2', arg2)), BooleanClause.Occur.SHOULD)
-		arg2_query.add(WildcardQuery(Term('arg2_categories', '*' + arg2.lower().replace(' ', '_') + '*')), BooleanClause.Occur.SHOULD)
+		arg2_query.add(WildcardQuery(Term('arg2', '*' + arg2 + '*')), BooleanClause.Occur.SHOULD)
+		arg2_query.add(WildcardQuery(Term('arg2_data', arg2.lower().replace(' ', '_'))), BooleanClause.Occur.SHOULD)
+		arg2_query.add(WildcardQuery(Term('arg2_data', 'en:' + arg2.lower().replace(' ', '_'))), BooleanClause.Occur.SHOULD)
+		arg2_query.add(WildcardQuery(Term('arg2_data', 'fa:' + arg2.lower().replace(' ', '_'))), BooleanClause.Occur.SHOULD)
 
 		rel_query.add(TermQuery(Term('rel', rel)), BooleanClause.Occur.SHOULD)
 		rel_query.add(TermQuery(Term('rel_cluster', rel)), BooleanClause.Occur.SHOULD)
@@ -44,20 +48,21 @@ class InformationSearcher():
 
 class Information():
 	def __init__(self, doc):
-		self.arg1 = doc.get('arg1')
-		self.arg2 = doc.get('arg2')
-		self.rel = doc.get('rel')
-		self.sentence = doc.get('info')
-		self.rel_cluster = doc.get('rel_cluster')
+		fields = doc.getFields()
+		i = 0
+		while i < fields.size():
+			field = fields.get(i)
+			self.addField(field.name().lower(), field.stringValue())
+			i += 1
 
 		def parse_data(arg1_data):
-			arg1_data = arg1_data.split(' ~ ')
-			if len(arg1_data) != 2:
+			if len(arg1_data) > 0:
+				return arg1_data[0], map(lambda label: label.replace('en:', '').replace('fa:', ''), arg1_data[1:])
+			else:
 				return '', ''
-			return arg1_data[0], arg1_data[1].replace('en:', '').replace('fa:', '')
 
-		self.arg1_wiki, self.arg1_labels = parse_data(doc.get('arg1_categories'))
-		self.arg2_wiki, self.arg2_labels = parse_data(doc.get('arg2_categories'))
+		self.arg1_wiki, self.arg1_labels = parse_data(self.arg1_data)
+		self.arg2_wiki, self.arg2_labels = parse_data(self.arg2_data)
 
 	def html(self):
 		highlights = {
@@ -66,8 +71,19 @@ class Information():
 			self.arg2: '<a class="arg2" {} rel="{}">{}</a>'.format('href="%s"' % self.arg2_wiki if self.arg2_wiki else '', self.arg2_labels, self.arg2),
 		}
 
-		result = ' '+ self.sentence +' '
+		result = ' ' + self.info + ' '
 		for key, value in highlights.items():
-			result = result.replace(' '+ key +' ', ' '+ value +' ')
+			result = result.replace(' ' + key + ' ', ' ' + value + ' ')
 
 		return result
+
+	def addField(self, name, value):
+		if hasattr(self, name):
+			val = getattr(self, name)
+			if isinstance(val, list):
+				val.append(value)
+			else:
+				newval = [val, value]
+				setattr(self, name, newval)
+		else:
+			setattr(self, name, value)

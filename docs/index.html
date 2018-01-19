@@ -80,7 +80,7 @@
 		$('#query .text-danger').hide();
 		$('#search').attr('disabled','disabled');
 		$.ajax({
-			url: 'http://api.sobhe.ir:8000/search',
+			url: 'http://api.sobhe.ir:9000/search',
 			type: 'POST',
 			dataType: 'json',
 			data: {'argument0': $('input[name=argument0]').val(), 'argument1': $('input[name=argument1]').val(), 'relation': $('input[name=relation]').val()},

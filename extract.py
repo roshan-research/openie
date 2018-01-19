@@ -13,7 +13,8 @@ uninformatives = set(sum([line.split(' - ') for line in codecs.open('data/adverb
 
 normalizer = Normalizer()
 tagger = POSTagger(model='resources/postagger.model')
-parser = TurboParser(tagger=tagger, lemmatizer=Lemmatizer(), model_file='resources/turboparser.model')
+# parser = TurboParser(tagger=tagger, lemmatizer=Lemmatizer(), model_file='resources/turboparser.model')
+parser = DependencyParser(tagger=tagger, lemmatizer=Lemmatizer())
 extractor = DependencyTreeInformationExtractor()
 
 

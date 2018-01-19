@@ -1,4 +1,21 @@
 
+@font-face {
+	font-family: IRMitra;
+	font-weight: normal;
+	src: url('http://www.sobhe.ir/fonts/IRMitra.woff') format('woff');
+}
+@font-face {
+	font-family: IRMitra;
+	font-weight: bold;
+	src: url('http://www.sobhe.ir/fonts/IRMitraBd.woff') format('woff');
+}
+@font-face {
+  font-family: BMitra;
+  font-weight: normal;
+  src: url('http://www.sobhe.ir/fonts/BMitra.woff') format('woff');
+}
+
+
 /* bootstrap */
 
 body {
